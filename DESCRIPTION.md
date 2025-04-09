@@ -167,3 +167,8 @@ Statistical data will be stored in a CSV file.
 |   3   | Survival time per game session | Assess player endurance and difficulty balance              | Median, SD       | Session Number                                 | Survival Time (Seconds)         |
 |   4   | High score per game            | Track progression and compare skill levels                  | Line Graph       | Session Number                                 | Score                            |
 |   5   | Player vs. Ghost Ratio         | Show ratio of players eating ghosts vs. being eaten         | Pie Chart        | Pac-Man Eating Ghosts vs. Pac-Man Eaten by Ghosts | Percentage of Total Interactions |
+
+---
+
+# UML
+<img src="uml.png" alt="UML" width="400"/>
