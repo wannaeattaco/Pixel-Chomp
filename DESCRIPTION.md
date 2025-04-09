@@ -1,19 +1,21 @@
 # Pixel Chomp
 
 ## 1. Project Overview
-This project creates a Pac-Man game using Python and Pygame. The game features a classic arcade-style maze where the player controls Pac-Man to eat dots and avoid ghosts. Game mechanics include power-ups, multiple difficulty levels, and score tracking.
+This project tries to create a Pac-Man game with Python and the Pygame. The game contains a classic arcade-style maze in which the player controls Pac-Man to eat dots and avoid ghosts. Pac-Man's game mechanics include power-ups that allow him to eat ghosts for a brief time, different difficulty levels, and score tracking.
+
 
 ## 2. Project Review
-An analysis of existing Pac-Man games revealed improvements for:
-- Enhanced ghost pathfinding and movement
-- Player statistics tracking
-- Timer for round duration
-- Three difficulty levels with varied mechanics
+An analysis of existing Pac-Man implementations, including the current Python-based Pygame version, highlights several areas for improvement:
+- Improved pathfinding and movement patterns for ghosts.
+- Add player statistics collection for performance insights.
+- Add timer for track time usage each round
+- Three difficulty levels with different gameplay mechanics
+
 
 ## 3. Programming Development
 
 ### 3.1 Game Concept
-Guide Pac-Man through a maze to collect dots and avoid ghosts. Power pellets allow temporary ghost-eating.
+The objective of the game is to guide Pac-Man through a maze, collecting all the dots while avoiding ghosts. Power pellets scattered throughout the maze temporarily allow Pac-Man to eat ghosts for bonus points. The player wins by clearing all the dots in the maze. And the player loses if Pac-Man loses all his lives after being caught by ghosts.
 
 **Game Modes:**
 1. **Easy**: Standard gameplay
@@ -22,7 +24,7 @@ Guide Pac-Man through a maze to collect dots and avoid ghosts. Power pellets all
 
 ### 3.2 Object-Oriented Programming Implementation
 
-#### PacMan (Player Character)
+#### PacMan (The player-controlled character)
 - **Attributes**: position, speed, state, lives
 - **Methods**: move(), eat_dot(), eat_ghost(), power_up()
 
