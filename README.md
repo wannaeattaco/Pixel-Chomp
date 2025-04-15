@@ -51,4 +51,4 @@ python main.py
 (For macOS users, use `python3 main.py` instead of `python main.py`)
 
 ## UML Diagram
-<img src="uml.png" alt="UML Diagram"/>
+<img src="uml.png" alt="UML" width="400"/>
