@@ -26,63 +26,99 @@ The objective of the game is to guide Pac-Man through a maze, collecting all the
 
 ### PacMan (The player-controlled character)
 **Attributes:**
-- `position`: Current location on the grid  
-- `speed`: Movement speed  
-- `state`: Normal or powered-up  
-- `lives`: Remaining lives  
+- `x, y`: Current location on the grid
+- `state`: Normal or powered-up state ('normal' or 'powered')
+- `power_timer`: Duration of power-up effect
+- `lives`: Remaining lives
+- `score`: Current score
+- `dots_collected`: Number of dots eaten
+- `ghosts_eaten`: Number of ghosts eaten
+- `power_pallets_collected`: Number of power pellets collected
+- `icon`: Turtle object for drawing
 
 **Methods:**
-- `move()`: Updates player position  
-- `eat_dot()`: Add score, removes dot  
-- `eat_ghost()`: Add score if powered-up  
-- `power_up()`: Enables temporary ability to eat ghosts  
+- `move()`: Updates player position and handles dot collection
+- `eat_ghost()`:Add score if powered-up
+- `power_up()`:  Enables temporary ability to eat ghosts
+- `change_state()`: Updates power pellet timer and state
+- `update_position()`: Updates Pac-Man's position on screen
+- `_setup_icon()`: Sets up Pac-Man's turtle icon
+- `_calculate_screen_position()`: Converts grid position to screen coordinates
 
 ### Ghost (Enemy chasing the player)
 **Attributes:**
-- `position`: Current location on the grid  
-- `speed`: Movement speed  
-- `direction`: Current moving direction  
-- `AI_state`: chase/scatter/frightened  
+- `x, y`: Current location on the grid
+- `start`: Spawn position
+- `original_color`: Ghost's color
+- `shape_name`: Custom ghost shape name
+- `icon`: Turtle object for drawing
+- `GHOST_COLORS`: Dictionary mapping color names to hex values
 
 **Methods:**
-- `move()`: Pathfinding logic  
-- `change_state()`: Switches AI mode  
-- `respawn()`: Resets position after being eaten  
-- `check_collisions()`: Interacts with Pac-Man and walls  
+- `pathfinding()`: A* pathfinding algorithm to find path to target or away from Pac-Man when powered
+- `move()`: Moves ghost towards target position or away from Pac-Man when powered
+- `update_position()`: Updates ghost's position and appearance
+- `respawn()`: Resets position after being eaten
+- `register_ghost_shape()`: Registers custom ghost shape for given color
 
 ### Maze (The game map and items on it)
 **Attributes:**
-- `layout`: Maze structure  
-- `dots`: Positions of collectible dots  
-- `power_pellets`: Positions of power-ups  
+- `layout`: Maze structure (0=wall, 1=dot, 2=power pellet, 3=empty, 4=Pac-Man start, 5=ghost spawn)
+- `pacman_start`: Starting position for Pac-Man
+- `ghost_spawns`: List of ghost spawn positions
+- `TILE_SIZE`: Size of each maze tile (24 pixels)
+- `MAZE_OFFSET_X, MAZE_OFFSET_Y`: Screen offset for maze drawing (-252, 252)
 
 **Methods:**
-- `load_maze()`: Loads maze from file  
-- `check_collision()`: Detects wall interactions  
-- `remove_dot()`: Removes collected items  
+- `load_maze()`: Loads and draws maze on screen
+- `check_collision()`: Checks if position is a wall
+- `_find_pacman_start()`: Finds Pac-Man's starting position
+- `_find_ghost_spawns()`: Finds ghost spawn positions
 
-### GameController (Manages game logic and rules)
+### GameController (Manages game state and controls)
 **Attributes:**
-- `game_state`: Running, paused, game over  
-- `score`: Current player score  
-- `timer`: Tracks time for session and power-ups  
-- `game_mode`: Current difficulty level  
+- `game_state`: Current game state (menu/running/game_over)
+- `score`: Current player score
+- `timer`:  Tracks time for session and power-ups
+- `game_mode`: Current difficulty level
+- `stats_manager`: Statistics tracking
+- `maze`: Current maze instance
+- `pacman`: Pac-Man instance
+- `ghosts`: List of ghost instances
+- `drawer`: Turtle object for drawing
+- `btn_style`: Dictionary of button styling properties
 
 **Methods:**
-- `start_game()`: Initializes and starts a new game  
-- `update_game_state()`: Updates game logic on each frame  
-- `check_win_condition()`: Detects win/loss  
-- `set_difficulty()`: Adjusts settings in each mode  
+- `start_game()`: Initializes and starts new game
+- `update_game_state()`: Updates game logic on each frame
+- `check_win_condition()`: Checks if all dots are collected
+- `set_difficulty()`: Shows difficulty selection menu
+- `update_status()`: Updates status display
+- `game_over_screen()`: Shows game over screen
+- `setup_controls()`: Sets up keyboard controls
+- `restart()`: Restarts current game
+- `quit_to_main()`: Returns to main menu
+- `show_main_menu()`: Displays main menu
+- `show_how_to_play()`: Shows game instructions
 
 ### StatisticsManager (Collects and analyzes player data)
 **Attributes:**
-- `player_data`: Stores all gameplay statistics  
-- `session_timer`: Measures the duration of each play session  
+- `player_data`: Stores all gameplay statistics
+- `timestamps`: List of game timestamps
+- `fig`: Matplotlib figure for graphs
+- `canvas`: Canvas for displaying graphs
 
 **Methods:**
-- `record_data()`: Tracks gameplay  
-- `save_to_file()`: Outputs to CSV  
-- `generate_report()`: Calculates stats  
+- `record_timestamp()`: Records game timestamp
+- `record_data()`: Tracks gameplay
+- `save_to_file()`: Outputs data to CSV
+- `generate_report()`: Generates performance report
+- `plot_text_stats()`: Plots text statistics
+- `plot_dots_by_difficulty()`: Plots dots collected by difficulty
+- `plot_ghosts_eaten()`: Plots ghosts eaten over sessions
+- `plot_high_scores()`: Plots high scores per session
+- `plot_player_vs_ghost()`: Plots player vs ghost ratio
+- `show_graph_selector()`: Shows graph selection window
 
 ## 3.3 Algorithms Involved
 - **Pathfinding**: A* or BFS algorithm for ghost movement.  
@@ -149,9 +185,9 @@ Statistical data will be stored in a CSV file.
 
 | **Feature**                | **Why is it good to have this data?**                                                                                       | **How will you obtain 50 values of this feature data?**                                | **Variable (Class)**                             | **Display Method**                                                |
 |----------------------------|------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------|
-| **Number of dots collected**   | Measures player efficiency in clearing the maze and tracks performance.                                                     | Record the number of dots Pac-Man has eaten at 10 different timestamps per game.        | `PacMan.dots_collected` (PacMan Class)           | Bar Chart (Comparing power pellet collection across difficulty modes) |
-| **Number of ghosts eaten**    | Indicates player’s risk-taking behavior and effectiveness in using power-ups.                                               | Track every ghost eaten at 10 different timestamps per game.                            | `PacMan.ghosts_eaten` (PacMan Class)             | Line Graph (Tracking ghost-eating trend over sessions)           |
-| **Survival time per game session** | Shows how long players last, helping analyze difficulty balance. Useful for tracking improvements in player skill.         | Record survival time every 10 seconds.                                                  | `StatisticsManager.session_timer` (StatisticsManager Class) | Median, Standard Deviation                                     |
+| **Number of dots collected**   | Measures player efficiency in clearing the maze and tracks performance.                                                     | Record the number of dots Pac-Man has eaten at 10 different timestamps per game.        | `PacMan.dots_collected` (PacMan Class)           | Box Plot (Comparing power pellet collection across difficulty modes) |
+| **Number of ghosts eaten**    | Indicates player's risk-taking behavior and effectiveness in using power-ups.                                               | Track every ghost eaten at 10 different timestamps per game.                            | `PacMan.ghosts_eaten` (PacMan Class)             | Line Graph (Tracking ghost-eating trend over sessions)           |
+| **Survival time per game session** | Shows how long players last, helping analyze difficulty balance. Useful for tracking improvements in player skill.         | Record survival time every 5 seconds.                                                  | `StatisticsManager.session_timer` (StatisticsManager Class) | Mean Deviation                                     |
 | **High score per game**        | Helps track player progression and performance trends over time. Used to compare skill levels in different difficulty modes. | Log the current score at 10 different timestamps per game.                              | `GameController.score` (GameController Class)     | Line Graph (Score progression over multiple sessions)           |
 | **Player vs. Ghost Ratio**     | Analyzes player aggression vs. caution, power-up effectiveness, and difficulty balancing.                                  | Track every ghost eaten and Pac-Man eaten by ghost at 10 different timestamps per game. | `PacMan.eat_ghost()` and `PacMan.live` (PacMan Class) | Pie Chart (Comparing eaten ghosts vs. times eaten by ghosts)    |
 
@@ -162,7 +198,7 @@ Statistical data will be stored in a CSV file.
 
 | **Graph** | **Feature Name**               | **Graph Objective**                                          | **Graph Type**  | **X-axis**                                   | **Y-axis**                        |
 |-----------|--------------------------------|--------------------------------------------------------------|------------------|-----------------------------------------------|----------------------------------|
-|   1   | Number of dots collected       | Measure player efficiency in clearing the maze              | Bar Chart        | Difficulty Mode                                | Dots Collected                   |
+|   1   | Number of dots collected       | Measure player efficiency in clearing the maze              | Box Plot        | Difficulty Mode                                | Dots Collected                   |
 |   2   | Number of ghosts eaten         | Track risk-taking behavior and power-up effectiveness       | Line Graph       | Session Number                                 | Number of Ghosts Eaten          |
 |   3   | Survival time per game session | Assess player endurance and difficulty balance              | Median, SD       | Session Number                                 | Survival Time (Seconds)         |
 |   4   | High score per game            | Track progression and compare skill levels                  | Line Graph       | Session Number                                 | Score                            |
