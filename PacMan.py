@@ -9,8 +9,8 @@ class PacMan:
     DOT_SCORE = 10
     POWER_SCORE = 50
     GHOST_SCORE = 200
-    DOT_SIZE = 8
-    POWER_SIZE = 14
+    DOT_SIZE = 10
+    POWER_SIZE = 16
     MAZE_OFFSET_X = -252
     MAZE_OFFSET_Y = 252
     NORMAL_STATE = 'normal'

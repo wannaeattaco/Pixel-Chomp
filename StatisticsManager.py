@@ -94,7 +94,7 @@ class StatisticsManager:
         return report
 
     def plot_text_stats(self, ax, df):
-        """Plot text statistics"""
+        """Plot text statistics in a table format"""
         difficulties = ['Easy', 'Normal', 'Hard']
         grouped = df.groupby('difficulty').agg({
             'score': ['max', 'mean'],
@@ -103,20 +103,44 @@ class StatisticsManager:
         grouped.columns = ['High Score', 'Average Score', 'Avg Survival Time (s)']
         grouped = grouped.reset_index()
         stats = {row['difficulty'].capitalize(): row for _, row in grouped.iterrows()}
-        text = ''
+
+        table_data = []
+        headers = ['Difficulty', 'High Score', 'Average Score', 'Avg Survival Time (s)']
+        
         for diff in difficulties:
             row = stats.get(diff, None)
-            text += f"{diff}\n"
             if row is not None:
-                text += f"High Score: {int(row['High Score'])}\n"
-                text += f"Average Score: {row['Average Score']:.2f}\n"
-                text += f"Average Survival Time: {row['Avg Survival Time (s)']:.1f}s\n\n"
+                table_data.append([
+                    diff,
+                    f"{int(row['High Score'])}",
+                    f"{row['Average Score']:.2f}",
+                    f"{row['Avg Survival Time (s)']:.1f}"
+                ])
             else:
-                text += "High Score: 0\nAverage Score: 0\nAverage Survival Time: 0.0s\n\n"
+                table_data.append([diff, "0", "0.00", "0.0"])
+
+        table = ax.table(
+            cellText=table_data,
+            colLabels=headers,
+            loc='center',
+            cellLoc='center',
+            colWidths=[0.2, 0.25, 0.25, 0.3]
+        )
+
+        table.auto_set_font_size(False)
+        table.set_fontsize(12)
+        table.scale(1.2, 1.5)
+
+        for (row, col), cell in table.get_celld().items():
+            if row == 0:
+                cell.set_text_props(weight='bold')
+                cell.set_facecolor('#404040')
+                cell.set_text_props(color='white')
+            else:
+                cell.set_facecolor('#f0f0f0' if row % 2 == 0 else 'white')
+
         ax.axis('off')
-        ax.text(0.01, 0.5, text, fontsize=14, color='black', ha='left', va='center',
-                family='monospace', transform=ax.transAxes,
-                bbox={"facecolor": "white", "edgecolor": "none"})
+        ax.set_title('Statistics by Difficulty', pad=20, fontsize=14, weight='bold')
 
     def plot_dots_by_difficulty(self, ax, df):
         """Plot dots collected by difficulty"""

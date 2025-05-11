@@ -185,11 +185,11 @@ Statistical data will be stored in a CSV file.
 
 | **Feature**                | **Why is it good to have this data?**                                                                                       | **How will you obtain 50 values of this feature data?**                                | **Variable (Class)**                             | **Display Method**                                                |
 |----------------------------|------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------|
-| **Number of dots collected**   | Measures player efficiency in clearing the maze and tracks performance.                                                     | Record the number of dots Pac-Man has eaten at 10 different timestamps per game.        | `PacMan.dots_collected` (PacMan Class)           | Box Plot (Comparing power pellet collection across difficulty modes) |
-| **Number of ghosts eaten**    | Indicates player's risk-taking behavior and effectiveness in using power-ups.                                               | Track every ghost eaten at 10 different timestamps per game.                            | `PacMan.ghosts_eaten` (PacMan Class)             | Line Graph (Tracking ghost-eating trend over sessions)           |
-| **Survival time per game session** | Shows how long players last, helping analyze difficulty balance. Useful for tracking improvements in player skill.         | Record survival time every 5 seconds.                                                  | `StatisticsManager.session_timer` (StatisticsManager Class) | Mean Deviation                                     |
+| **Number of dots collected**   | Measures player efficiency in clearing the maze and tracks performance.                                                     | Record the number of dots Pac-Man has eaten at 10 different timestamps per game.        | `StatisticsManager.dots_collected` (PacMan Class)           | Box Plot (Comparing power pellet collection across difficulty modes) |
+| **Number of ghosts eaten**    | Indicates player's risk-taking behavior and effectiveness in using power-ups.                                               | Track every ghost eaten at 10 different timestamps per game.                            | `StatisticsManager.ghosts_eaten` (PacMan Class)             | Line Graph (Tracking ghost-eating trend over sessions)           |
+| **Survival time per game session** | Shows how long players last, helping analyze difficulty balance. Useful for tracking improvements in player skill.         | Record survival time every 5 seconds.                                                  | `StatisticsManager.timestamps` (StatisticsManager Class) | Mean Deviation                                     |
 | **High score per game**        | Helps track player progression and performance trends over time. Used to compare skill levels in different difficulty modes. | Log the current score at 10 different timestamps per game.                              | `GameController.score` (GameController Class)     | Line Graph (Score progression over multiple sessions)           |
-| **Player vs. Ghost Ratio**     | Analyzes player aggression vs. caution, power-up effectiveness, and difficulty balancing.                                  | Track every ghost eaten and Pac-Man eaten by ghost at 10 different timestamps per game. | `PacMan.eat_ghost()` and `PacMan.live` (PacMan Class) | Pie Chart (Comparing eaten ghosts vs. times eaten by ghosts)    |
+| **Player vs. Ghost Ratio**     | Analyzes player aggression vs. caution, power-up effectiveness, and difficulty balancing.                                  | Track every ghost eaten and Pac-Man eaten by ghost at 10 different timestamps per game. | `StatisticsManager.ghosts_eaten` and `StatisticsManager.lives_lost` (PacMan Class) | Pie Chart (Comparing eaten ghosts vs. times eaten by ghosts)    |
 
 
 ---
@@ -208,3 +208,130 @@ Statistical data will be stored in a CSV file.
 
 # UML
 <img src="uml.png" alt="UML" width="400"/>
+
+## 3.3 Class Relationships and UML
+
+### Class Relationships
+
+1. **GameController** (Main Controller)
+   - Has-a **Maze**: Manages the game map
+   - Has-a **PacMan**: Controls the player character
+   - Has-many **Ghost**: Manages multiple ghost instances
+   - Has-a **StatisticsManager**: Handles game statistics
+   - Uses **turtle.Screen**: For game display
+   - Uses **tkinter**: For UI elements
+
+2. **PacMan** (Player)
+   - Has-a **Maze**: References for movement and collision
+   - Uses **turtle.Turtle**: For visual representation
+   - Interacts with **Ghost**: For ghost eating mechanics
+
+3. **Ghost** (Enemy)
+   - Has-a **Maze**: References for movement and collision
+   - Uses **turtle.Turtle**: For visual representation
+   - Interacts with **PacMan**: For chase/escape mechanics
+
+4. **Maze** (Game Map)
+   - Contains game layout data
+   - Provides collision detection
+   - Manages spawn points
+
+5. **StatisticsManager** (Data Handler)
+   - Uses **pandas**: For data analysis
+   - Uses **matplotlib**: For visualization
+   - Uses **tkinter**: For statistics UI
+
+### UML Diagram
+
+```mermaid
+classDiagram
+    class GameController {
+        -game_state: str
+        -score: int
+        -timer: int
+        -game_mode: str
+        -maze: Maze
+        -pacman: PacMan
+        -ghosts: List~Ghost~
+        -stats_manager: StatisticsManager
+        +start_game(difficulty)
+        +update_game_state(screen)
+        +check_win_condition()
+        +set_difficulty()
+    }
+
+    class PacMan {
+        -x: int
+        -y: int
+        -state: str
+        -power_timer: int
+        -lives: int
+        -score: int
+        +move(dx, dy, drawer)
+        +eat_ghost()
+        +power_up()
+        +change_state()
+    }
+
+    class Ghost {
+        -x: int
+        -y: int
+        -start: tuple
+        -original_color: str
+        +pathfinding(target_x, target_y, powered)
+        +move(tx, ty, powered)
+        +update_position()
+        +respawn()
+    }
+
+    class Maze {
+        -layout: List~List~int~~
+        -pacman_start: tuple
+        -ghost_spawns: List~tuple~
+        +load_maze(drawer)
+        +check_collision(x, y)
+        -_find_pacman_start()
+        -_find_ghost_spawns()
+    }
+
+    class StatisticsManager {
+        -player_data: dict
+        -timestamps: List
+        +record_timestamp(timestamp, pacman)
+        +record_data(pacman, duration, difficulty)
+        +save_to_file(filename)
+        +generate_report()
+    }
+
+    GameController --> Maze : contains
+    GameController --> PacMan : contains
+    GameController --> Ghost : contains
+    GameController --> StatisticsManager : contains
+    PacMan --> Maze : uses
+    Ghost --> Maze : uses
+    PacMan ..> Ghost : interacts with
+    Ghost ..> PacMan : interacts with
+```
+
+### Key Relationships Explained
+
+1. **Composition Relationships**
+   - GameController owns and manages all other game objects
+   - Each object (PacMan, Ghost) has its own turtle instance for rendering
+
+2. **Dependency Relationships**
+   - PacMan and Ghost depend on Maze for movement and collision
+   - All classes use turtle for graphics
+   - StatisticsManager depends on pandas and matplotlib for data handling
+
+3. **Interaction Patterns**
+   - PacMan and Ghost interact for chase/escape mechanics
+   - GameController coordinates all interactions
+   - StatisticsManager observes and records game events
+
+4. **Data Flow**
+   - Game state flows from GameController to other objects
+   - Statistics flow from game objects to StatisticsManager
+   - User input flows through GameController to PacMan
+
+This UML diagram and relationship description provides a clear overview of how the different components of the game interact with each other and their responsibilities.
